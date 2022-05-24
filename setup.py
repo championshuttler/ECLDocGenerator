@@ -1,8 +1,8 @@
 from distutils.core import setup
 
 setup(
-    name = 'ecl-doc',
-    packages = ['ecl-doc'],
+    name = 'ECLDocGenerator',
+    packages = ['ECLDocGenerator'],
     version = '1.0.0',  # Ideally should be same as your GitHub release tag varsion
     description = 'description',
     author = '',
