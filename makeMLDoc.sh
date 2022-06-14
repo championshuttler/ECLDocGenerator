@@ -1,6 +1,9 @@
 #!/bin/sh
 # Generate each bundle's documentation
 
+
+mkdir -p ~/share/Publish
+
 # ML_Core
 ecldoc --iroot ~/source/ML_Core --oroot ~/docs/ML_Core --format "html,pdf" --hideInternal
 
@@ -17,7 +20,7 @@ ecldoc --iroot ~/source/LearningTrees --oroot ~/docs/LearningTrees --eclcc=" -I 
 ecldoc --iroot ~/source/LogisticRegression --oroot ~/docs/LogisticRegression --eclcc=" -I ~/source" --exdocpaths ~/docs/ML_Core/xml --format "html,pdf" --exclude "IRLS/*.ecl,performance/*.ecl,validation/*.ecl" --hideInternal
 
 # LinearRegression
-ecldoc --iroot ~/source/LinearRegression --oroot ~/docs/LinearRegression --eclcc=" -I ~/source" --exdocpaths ~/docs/ML_Core/xml,docs/PBblas/xml --format "html,pdf" --exclude "performance/*.ecl,test/*.ecl,test/Datasets/*.ecl,test/Utils/*.ecl" --hideInternal
+ecldoc --iroot ~/source/LinearRegression --oroot ~/docs/LinearRegression --eclcc=" -I ~/source" --exdocpaths ~/docs/ML_Core/xml, ~/docs/PBblas/xml --format "html,pdf" --exclude "performance/*.ecl,test/*.ecl,test/Datasets/*.ecl,test/Utils/*.ecl" --hideInternal
 
 # GLM
 ecldoc --iroot ~/source/GLM --oroot ~/docs/GLM --eclcc=" -I ~/source" --exdocpaths ~/docs/ML_Core/xml,docs/PBblas/xml --format "html,pdf" --exclude "performance/*.ecl,validation/*.ecl, IRLS/*.ecl,Datasets/*.ecl" --hideInternal
@@ -39,6 +42,9 @@ ecldoc --iroot ~/source/dbscan --oroot ~/docs/dbscan --eclcc=" -I ~/source" --ex
 
 # HPCC-Causality
 ecldoc --iroot ~/source/HPCC_Causality --oroot ~/docs/HPCC_Causality --eclcc=" -I ~/source"  --format "html,pdf" --exclude "internal/*.ecl,Test/*.ecl,Test/Causality/*.ecl,Test/Probability/*.ecl,Test/Synth/*.ecl,performance/*.ecl,ecl/*.ecl" --hideInternal
+
+
+ecldoc --iroot ~/source/GaussianProcessRegression --oroot ~/docs/GaussianProcessRegression --eclcc=" -I ~/source" --exdocpaths ~/docs/ML_Core/xml --format "html,pdf" --exclude "Internal/*.ecl,Test/*.ecl," --hideInternal
 
 # Now we copy the resulting index.pdf files to files in our publish area named correctly for each bundle.
 
