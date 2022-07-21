@@ -11,7 +11,7 @@ from ecldoc.Constants import TEMPLATE_DIR
 TXT_TEMPLATE_DIR = joinpath(TEMPLATE_DIR, 'txt')
 
 ###################################################################
-
+removeHTMLTag = re.compile(r'<.*?>')
 import jinja2
 
 txt_jinja_env = jinja2.Environment(
@@ -74,6 +74,7 @@ class ParseTXT(object) :
         self.parseSource()
 
         render = self.template.render(src=src, defn_tree=self.defn_tree)
+        render = re.sub(removeHTMLTag, '', render)
         write_to_file(self.txt_file, render)
 
     def docstring(self) :
@@ -123,9 +124,13 @@ class ParseTXT(object) :
                 if 'generaltag' in tag_renders :
                     render = tag_renders['generaltag'](
                                 taglets['generaltag'](doc=tags[tag], defn=defn, tagname=tag))
+                    render = re.sub(removeHTMLTag, '', render)
+
                     renders[tag] = render
                 continue
             render = tag_renders[tag](taglets[tag](doc=tags[tag], defn=defn, tagname=tag))
+            render = re.sub(removeHTMLTag, '', render)
+
             renders[tag] = render
 
         return renders
@@ -185,6 +190,8 @@ class GenTXT(object) :
             os.makedirs(content_root, exist_ok=True)
             render = self.toc_template.render(name=key, files=childfiles, bundle=bundle)
             render_path = joinpath(content_root, 'pkg.toc.txt')
+            render = re.sub(removeHTMLTag, '', render)
+
             write_to_file(render_path, render)
 
             return file

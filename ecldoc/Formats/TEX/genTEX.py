@@ -14,7 +14,9 @@ from ecldoc.Constants import TEMPLATE_DIR
 from ecldoc.markdown2latex import LaTeXExtension
 
 TEX_TEMPLATE_DIR = joinpath(TEMPLATE_DIR, 'tex')
+import re
 
+removeHTMLTag = re.compile(r'<.*?>')
 
 import jinja2
 latex_jinja_env = jinja2.Environment(
@@ -86,6 +88,7 @@ class ParseTEX(object) :
         self.parseSource()
 
         render = self.template.render(name=name, src=src, defn_tree=self.defn_tree, up=('toc:'+self.dirname))
+        render = re.sub(removeHTMLTag, '', render)
         write_to_file(self.tex_file, render)
 
     def docstring(self) :
@@ -133,12 +136,12 @@ class ParseTEX(object) :
                 if 'generaltag' in tag_renders :
                     render = tag_renders['generaltag'](
                                 taglets['generaltag'](doc=tags[tag], defn=defn, tagname=tag))
-                    renders[tag] = render
+                    renders[tag] = re.sub(removeHTMLTag, '', render)
                 continue
             render = tag_renders[tag](taglets[tag](doc=tags[tag], defn=defn, tagname=tag))
-            renders[tag] = render
+            renders[tag] = re.sub(removeHTMLTag, '', render)
 
-        renders['inherit'] = tag_renders['inherit'](defn.attrib['inherittype'])
+        renders['inherit'] = re.sub(removeHTMLTag, '', tag_renders['inherit'](defn.attrib['inherittype']))
 
         return renders
 
@@ -212,7 +215,7 @@ class GenTEX(object) :
             render = self.toc_template.render(name=key, files=childfiles, bundle=bundle,
                                             label=tex_relpath, up=dirname(tex_relpath))
 
-            render = render.replace("<p>", '').replace("</p>", '').replace('<div>', '').replace('</div>', '')
+            render = re.sub(removeHTMLTag, '', render)
             if key == "root":
                 end_of_toc = "\\end{tabularx}\n\n"
                 render_temp = render.split(end_of_toc)
@@ -222,14 +225,13 @@ class GenTEX(object) :
                 md = markdown.Markdown()
                 mkdn2latex = LaTeXExtension()
                 mkdn2latex.extendMarkdown(md, markdown.__dict__)
-                readmeLatexContent = md.convert(readme_data_in_markdown).replace("</div>", "").replace("<div>", "")
-                print(readme_data_in_markdown)
-                print(readmeLatexContent)
+                readmeLatexContent = md.convert(readme_data_in_markdown)
+                
                 render = """{render_temp_start}{end_of_toc}{readme}\n\n{render_temp_end}""".format(
                     render_temp_start=render_temp[0],
                     render_temp_end=render_temp[1], 
                     end_of_toc=end_of_toc,
-                    readme= readmeLatexContent
+                    readme= re.sub(removeHTMLTag, '', readmeLatexContent)
                 ).strip()
             write_to_file(render_path, render)
 
@@ -237,14 +239,14 @@ class GenTEX(object) :
                                             files=[x for x in childfiles if x['type'] == 'file'],
                                             bundle=bundle, label=tex_relpath, up="")
             
-            render = render.replace("<p>", '').replace("</p>", '').replace('<div>', '').replace('</div>', '')
+            render = re.sub(removeHTMLTag, '', render)
             write_to_file(temptoc_render_path, render)
 
             # Render index.pdf
             start_path = relpath(temptoc_render_path, self.tex_path)
             render = self.index_template.render(root=start_path)
 
-            render = render.replace("<p>", '').replace("</p>", '').replace('<div>', '').replace('</div>', '')
+            render = re.sub(removeHTMLTag, '', render)
             write_to_file(index_render_path, render)
             subprocess.run(['pdflatex ' +
                             '-output-directory ' + relpath(content_root, self.tex_path) + ' ' +
@@ -264,7 +266,7 @@ class GenTEX(object) :
         start_path = relpath(render_path, self.tex_path)
         render = self.index_template.render(root=start_path)
 
-        render = render.replace("<p>", '').replace("</p>", '').replace('<div>', '').replace('</div>', '')
+        render = re.sub(removeHTMLTag, '', render)
         write_to_file(joinpath(self.tex_path, 'index.tex'), render)
 
         subprocess.run(['pdflatex index.tex'], cwd=self.tex_path, shell=True)
